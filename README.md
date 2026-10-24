@@ -6,23 +6,6 @@ The assistant provides safe arithmetic computation via Python AST, factual retri
 
 ---
 
-## 📌 Table of Contents
-1. [Project Overview](#project-overview)
-2. [Key Features](#key-features)
-3. [Architecture](#architecture)
-4. [Technology Stack](#technology-stack)
-5. [Folder Structure](#folder-structure)
-6. [Prerequisites](#prerequisites)
-7. [Windows PowerShell Setup & Installation](#windows-powershell-setup--installation)
-8. [Environment Configuration](#environment-configuration)
-9. [Running the Application](#running-the-application)
-10. [Running Automated Tests](#running-automated-tests)
-11. [Sample Demonstration Questions](#sample-demonstration-questions)
-12. [Root Cause Analysis & Troubleshooting](#root-cause-analysis--troubleshooting)
-13. [Viva / Demonstration Guide](#viva--demonstration-guide)
-
----
-
 ## Project Overview
 
 The **AI Agent Study Assistant** is designed for college students and educators to study core machine-learning concepts and perform mathematical operations without hallucination. 
@@ -228,4 +211,3 @@ python test_model.py
 
 ---
 
-tool output and returns the final human-readable response.

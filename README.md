@@ -6,23 +6,6 @@ The assistant provides safe arithmetic computation via Python AST, factual retri
 
 ---
 
-## 📌 Table of Contents
-1. [Project Overview](#project-overview)
-2. [Key Features](#key-features)
-3. [Architecture](#architecture)
-4. [Technology Stack](#technology-stack)
-5. [Folder Structure](#folder-structure)
-6. [Prerequisites](#prerequisites)
-7. [Windows PowerShell Setup & Installation](#windows-powershell-setup--installation)
-8. [Environment Configuration](#environment-configuration)
-9. [Running the Application](#running-the-application)
-10. [Running Automated Tests](#running-automated-tests)
-11. [Sample Demonstration Questions](#sample-demonstration-questions)
-12. [Root Cause Analysis & Troubleshooting](#root-cause-analysis--troubleshooting)
-13. [Viva / Demonstration Guide](#viva--demonstration-guide)
-
----
-
 ## Project Overview
 
 The **AI Agent Study Assistant** is designed for college students and educators to study core machine-learning concepts and perform mathematical operations without hallucination. 
@@ -228,48 +211,3 @@ python test_model.py
 
 ---
 
-## Root Cause Analysis & Troubleshooting
-
-### Why Did `gemini-3.8-flash` Experience 133s Latency or 504 Deadlines?
-
-During Phase 1 diagnosis, direct benchmarks isolated the exact root cause:
-
-1. **Server-Side Queueing on Experimental Tier:**
-   - Empirical diagnostic testing showed that `gemini-3.8-flash` requests on free-tier API quotas take between **122.15s and 148.58s** on Google's backend.
-   - When HTTP timeout is configured to 30s or 120s, requests abort with `504 DEADLINE_EXCEEDED`.
-2. **Model Availability & Deprecation:**
-   - Legacy models like `gemini-2.5-flash` return `404 NOT_FOUND` for new API keys with the message: *"This model is no longer available to new users"*.
-3. **The Solution:**
-   - Selecting `gemini-flash-lite-latest` drops latency from **122+ seconds down to 1.5 - 1.9 seconds** while maintaining 100% tool-calling precision.
-   - The UI includes a model selector in the sidebar so users can seamlessly switch models or benchmark them in real time.
-
-### Troubleshooting Common Errors
-
-- **`504 DEADLINE_EXCEEDED`**:
-  - The model took too long to answer. In the sidebar, ensure `gemini-flash-lite-latest` is selected, or increase `GEMINI_TIMEOUT_SECONDS=60` in `.env`.
-- **`429 RESOURCE_EXHAUSTED`**:
-  - Free tier rate limit reached (typically 15 requests/minute). Wait 10 seconds before asking another question.
-- **`401 UNAUTHENTICATED / API_KEY_INVALID`**:
-  - Your Gemini API key is missing or incorrect. Verify `.env` has `GEMINI_API_KEY=AIzaSy...`.
-- **`404 NOT_FOUND`**:
-  - The model name is retired or misspelled. Use `gemini-flash-lite-latest`.
-
----
-
-## Viva / Demonstration Guide
-
-### 1. What is an AI Agent?
-An AI Agent is a system where an LLM is given reasoning instructions and access to executable **tools** (functions). Instead of predicting answers directly from memorized training weights, the agent decides *when* and *which* tool to call, executes it, and synthesizes the verified output for the user.
-
-### 2. Why use Python AST instead of `eval()`?
-`eval()` executes arbitrary Python code with full system privileges, allowing malicious prompts to execute `__import__('os').system('rmdir /s /q ...')` or steal files. Python's Abstract Syntax Tree (`ast.parse`) parses expressions into a syntax tree, allowing our code to strictly whitelist mathematical operations and reject any unauthorized node.
-
-### 3. How does the agent prevent hallucination for course notes?
-When a query asks about notes, the `search_notes` tool checks specific machine learning topic patterns. If the topic is missing, it explicitly returns `NO_MATCH`. The system instructions strictly bind the model to report missing topics rather than inventing facts.
-
-### 4. How does the Google Gen AI SDK handle Automatic Function Calling (AFC)?
-With `client.chats.create(tools=[...])`, the SDK automatically manages the conversation cycle:
-1. User prompt sent to Gemini.
-2. Gemini returns a tool-call request (`function_call`).
-3. SDK executes the local Python function and sends the `function_response` back to Gemini.
-4. Gemini summarizes the tool output and returns the final human-readable response.
